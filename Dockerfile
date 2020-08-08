@@ -15,13 +15,13 @@ ENV ANDROID_API=29
 ENV PATH=/opt/android/android-ndk-r20/toolchains/llvm/prebuilt/linux-x86_64/bin/:$PATH
 
 RUN cd openssl-1.1.1g && \
-	./Configure android-arm64 -D__ANDROID_API__=$ANDROID_API && make -j8 && \
+	./Configure android-arm64 -D__ANDROID_API__=$ANDROID_API && make -j$(nproc) && \
 	mkdir lib && cp lib*.a lib/
 
 RUN cd pjproject && \
 	echo "#define PJ_CONFIG_ANDROID 1" > pjlib/include/pj/config_site.h && \
 	echo "#include <pj/config_site_sample.h>" > pjlib/include/pj/config_site.h && \
-	./configure-android --use-ndk-cflags --with-ssl=/openssl-1.1.1g && \
-	make -j8 dep && make clean && make -j8
+	./configure-android --use-ndk-cflags --enable-shared --with-ssl=/openssl-1.1.1g && \
+	make -j$(nproc) dep && make clean && make -j$(nproc)
 
-RUN cd pjproject/pjsip-apps/src/swig/ && make
+#RUN cd pjproject/pjsip-apps/src/swig/ && make
